@@ -6,7 +6,10 @@
 <body>
   <h1>Dont speak</h1>
 
-<audio id="adAudio" src="https://minecraftuser2.github.io/Teacher/school-ad.mp3" controls></audio>
+<script>
+const adAudio = document.getElementById('adAudio');
+adAudio.src = "https://minecraftuser2.github.io/Teacher/school-ad.mp3";
+</script>
 
   <script>
     async function initNoiseDetection() {

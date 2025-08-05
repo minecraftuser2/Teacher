@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Teaching no noise</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Classroom Screen with Noise Detection</title>
 </head>
 <body>
-  <h1>Dont speak</h1>
+  <h1>Classroom Screen</h1>
+  <p>no speaking</p>
+  <button id="startBtn">Start</button>
 
-<audio id="adAudio" src="school-ad.mp3"></audio>
-
-<script>
-const adAudio = document.getElementById('adAudio');
-adAudio.src = "https://minecraftuser2.github.io/Teacher/school-ad.mp3";
-</script>
+  <audio id="adAudio" src="school-ad.mp3"></audio>
 
   <script>
+    const startBtn = document.getElementById('startBtn');
+
     async function initNoiseDetection() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -26,14 +27,12 @@ adAudio.src = "https://minecraftuser2.github.io/Teacher/school-ad.mp3";
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         const adAudio = document.getElementById('adAudio');
         let adPlaying = false;
-        const noiseThreshold = 30;  // Adjust this threshold to ignore breathing noise
 
         function checkVolume() {
           analyser.getByteFrequencyData(dataArray);
-          // Calculate average volume level
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
 
-          if (avg > noiseThreshold && !adPlaying) {
+          if (avg > 20 && !adPlaying) {
             adPlaying = true;
             adAudio.play();
           }
@@ -52,7 +51,11 @@ adAudio.src = "https://minecraftuser2.github.io/Teacher/school-ad.mp3";
       }
     }
 
-    initNoiseDetection();
+    startBtn.addEventListener('click', () => {
+      initNoiseDetection();
+      startBtn.disabled = true;
+      startBtn.textContent = 'Listening...';
+    });
   </script>
 </body>
 </html>

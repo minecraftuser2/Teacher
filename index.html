@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Classroom Screen with Noise Detection</title>
+  <title>Teaching no noise</title>
 </head>
 <body>
-  <h1>Classroom Screen</h1>
-  <p>Make no noise!</p>
+  <h1>Dont speak</h1>
 
   <audio id="adAudio" src="school-ad.mp3"></audio>
 
@@ -24,12 +21,14 @@
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         const adAudio = document.getElementById('adAudio');
         let adPlaying = false;
+        const noiseThreshold = 30;  // Adjust this threshold to ignore breathing noise
 
         function checkVolume() {
           analyser.getByteFrequencyData(dataArray);
+          // Calculate average volume level
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
 
-          if (avg > 20 && !adPlaying) {
+          if (avg > noiseThreshold && !adPlaying) {
             adPlaying = true;
             adAudio.play();
           }

@@ -2,59 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Classroom Screen with Noise Detection</title>
+  <title>No Speaking or else</title>
 </head>
 <body>
-  <h1>Classroom Screen</h1>
-  <p>no speaking</p>
+  <h1>no speaking</h1>
   <button id="startBtn">Start</button>
-
-  <audio id="adAudio" src="school-ad.mp3"></audio>
+  <audio id="adAudio" src="https://minecraftuser2.github.io/Teacher/school-ad.mp3"></audio>
 
   <script>
     const startBtn = document.getElementById('startBtn');
+    const adAudio = document.getElementById('adAudio');
 
-    async function initNoiseDetection() {
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      startBtn.innerText = 'Listening...';
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(stream);
-        const analyser = audioContext.createAnalyser();
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const source = context.createMediaStreamSource(stream);
+        const analyser = context.createAnalyser();
         source.connect(analyser);
-        analyser.fftSize = 512;
+        analyser.fftSize = 256;
 
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        const adAudio = document.getElementById('adAudio');
+
         let adPlaying = false;
 
-        function checkVolume() {
+        function detectNoise() {
           analyser.getByteFrequencyData(dataArray);
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
 
-          if (avg > 20 && !adPlaying) {
+          if (avg > 15 && !adPlaying) {
             adPlaying = true;
-            adAudio.play();
+            adAudio.play().catch(console.error);
           }
 
           adAudio.onended = () => {
             adPlaying = false;
           };
 
-          requestAnimationFrame(checkVolume);
+          requestAnimationFrame(detectNoise);
         }
 
-        checkVolume();
-
+        detectNoise();
       } catch (err) {
-        console.error('Microphone access denied or not available:', err);
+        console.error('Mic access error:', err);
+        alert('Microphone access is required.');
       }
-    }
-
-    startBtn.addEventListener('click', () => {
-      initNoiseDetection();
-      startBtn.disabled = true;
-      startBtn.textContent = 'Listening...';
     });
   </script>
 </body>
